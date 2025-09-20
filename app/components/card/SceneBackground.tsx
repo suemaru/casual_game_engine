@@ -41,7 +41,7 @@ export function SceneBackground({ reducedMotion, isMobile }: SceneBackgroundProp
 
       <Sparkles
         color="#8bbdff"
-        count={reducedMotion ? 90 : 180}
+        count={reducedMotion ? 180 : 360}
         size={reducedMotion ? 1.8 : 3.1}
         speed={reducedMotion ? 0 : 0.32}
         opacity={0.55}
@@ -49,7 +49,7 @@ export function SceneBackground({ reducedMotion, isMobile }: SceneBackgroundProp
       />
       <Sparkles
         color="#a8d7ff"
-        count={reducedMotion ? 45 : 110}
+        count={reducedMotion ? 90 : 220}
         size={reducedMotion ? 1.4 : 2.2}
         speed={reducedMotion ? 0 : 0.45}
         opacity={0.42}

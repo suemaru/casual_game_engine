@@ -6,10 +6,7 @@ import { useTexture } from '@react-three/drei';
 import {
   Color,
   Group,
-  Path,
   PlaneGeometry,
-  Shape,
-  ShapeGeometry,
   SRGBColorSpace,
   Vector2,
 } from 'three';
@@ -55,6 +52,7 @@ export function CardScene({
     main: spec.assets.main,
     background: spec.assets.background,
     subject: spec.assets.subject ?? spec.assets.main,
+    frame: '/assets/card/frame.png',
   });
 
   useEffect(() => {
@@ -94,35 +92,9 @@ export function CardScene({
   useEffect(() => () => frontMaterial.dispose(), [frontMaterial]);
   useEffect(() => () => backMaterial.dispose(), [backMaterial]);
 
-  const frameGeometry = useMemo(() => {
-    const outer = new Shape();
-    const halfW = CARD_WIDTH / 2;
-    const halfH = CARD_HEIGHT / 2;
-    outer.moveTo(-halfW, -halfH);
-    outer.lineTo(halfW, -halfH);
-    outer.lineTo(halfW, halfH);
-    outer.lineTo(-halfW, halfH);
-    outer.lineTo(-halfW, -halfH);
-
-    const inset = 0.03;
-    const inner = new Path();
-    inner.moveTo(-halfW + inset, -halfH + inset);
-    inner.lineTo(halfW - inset, -halfH + inset);
-    inner.lineTo(halfW - inset, halfH - inset);
-    inner.lineTo(-halfW + inset, halfH - inset);
-    inner.lineTo(-halfW + inset, -halfH + inset);
-    outer.holes.push(inner);
-
-    return new ShapeGeometry(outer, 2);
-  }, []);
-
-  useEffect(() => () => frameGeometry.dispose(), [frameGeometry]);
-
-  const rimGeometry = useMemo(() => new PlaneGeometry(CARD_WIDTH * 1.02, CARD_HEIGHT * 1.02), []);
   const baseGeometry = useMemo(() => new PlaneGeometry(CARD_WIDTH, CARD_HEIGHT), []);
 
   useEffect(() => () => baseGeometry.dispose(), [baseGeometry]);
-  useEffect(() => () => rimGeometry.dispose(), [rimGeometry]);
 
   useEffect(() => {
     burstRef.current = 0;
@@ -185,15 +157,13 @@ export function CardScene({
     backMaterial.uniforms.uOpacity.value = 0.55 + 0.35 * introEase;
   });
 
-  const frameMetalness = quality === 'low' ? 0.75 : 1;
-
   return (
     <group ref={groupRef}>
       <mesh position={[0, 0, -0.08]} geometry={baseGeometry}>
-        <meshBasicMaterial color={0x02040a} opacity={0.65} transparent />
+        <meshBasicMaterial color={0x07090f} opacity={0.78} transparent />
       </mesh>
 
-      <mesh position={[0, 0, -0.012]} geometry={baseGeometry}>
+        <mesh position={[0, 0, -0.012]} geometry={baseGeometry}>
         <primitive object={backMaterial} attach="material" />
       </mesh>
 
@@ -217,21 +187,22 @@ export function CardScene({
         <primitive object={frontMaterial} attach="material" />
       </mesh>
 
-      <mesh position={[0, 0, IMAGE_DEPTH * 1.3]} geometry={frameGeometry}>
-        <meshPhysicalMaterial
-          color={0xdcc67c}
-          emissive={0x281d07}
-          metalness={frameMetalness}
-          roughness={0.15}
-          clearcoat={0.6}
-          clearcoatRoughness={0.3}
-          reflectivity={0.85}
-        />
-      </mesh>
+        <mesh position={[0, 0, IMAGE_DEPTH * 1.36]} geometry={baseGeometry}>
+          <meshPhysicalMaterial
+            map={textures.frame}
+            transparent
+            depthWrite={false}
+            metalness={1}
+            roughness={0.16}
+            clearcoat={0.8}
+            clearcoatRoughness={0.2}
+            emissive={0x1a1305}
+            emissiveIntensity={0.18}
+            alphaTest={0.02}
+          />
+        </mesh>
 
-      <mesh position={[0, 0, IMAGE_DEPTH * 1.4]} geometry={rimGeometry}>
-        <meshBasicMaterial color={0xffffff} transparent opacity={0.18} depthWrite={false} />
-      </mesh>
+      
     </group>
   );
 }

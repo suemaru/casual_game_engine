@@ -2,7 +2,7 @@
 
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { PerformanceMonitor } from '@react-three/drei';
+import { PerformanceMonitor, Environment } from '@react-three/drei';
 import { ACESFilmicToneMapping, CineonToneMapping, SRGBColorSpace } from 'three';
 import { CardSpec } from '../../data/cardSpec';
 import { CardController } from './CardController';
@@ -66,9 +66,10 @@ export function CardCanvas({
       dpr={isMobile ? [1, 1.2] : [1, 2]}
     >
       <PerformanceMonitor onChange={handlePerformance} />
-      <ambientLight intensity={0.62} />
-      <directionalLight position={[1.5, 2.2, 3]} intensity={1.1} />
-      <directionalLight position={[-2.5, -1.5, 2]} intensity={0.4} />
+      <Environment preset="studio" resolution={256} />
+      <ambientLight intensity={0.56} />
+      <directionalLight position={[1.5, 2.2, 3]} intensity={1.05} />
+      <directionalLight position={[-2.5, -1.5, 2]} intensity={0.36} />
       <Suspense fallback={null}>
         <CardScene
           spec={spec}

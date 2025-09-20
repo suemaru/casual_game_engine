@@ -70,7 +70,7 @@ export function CardShowcase({ spec }: CardShowcaseProps) {
           `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
         );
         // depth を変えるとUIカードの浮き具合を調整できる
-        const depth = 0.6 + (Math.abs(rotateX) + Math.abs(rotateY)) * 0.05;
+        const depth = 0;
         overlay.style.setProperty('--overlay-z', `${depth}`);
       }
       raf = requestAnimationFrame(update);
