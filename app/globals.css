@@ -1,0 +1,36 @@
+:root {
+  color-scheme: dark;
+  background: radial-gradient(circle at 30% 10%, #1a2035, #05060d 55%, #020308 100%);
+  color: #f3f4f6;
+  font-family: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+main {
+  width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  body {
+    align-items: flex-start;
+    padding-top: 3rem;
+  }
+}
