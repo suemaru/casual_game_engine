@@ -1,0 +1,194 @@
+.previewStack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1.2rem, 1.8vw, 1.6rem);
+}
+
+.card {
+  --card-width: min(344px, calc(100vw - 48px));
+  --card-height: calc(var(--card-width) * 208 / 344);
+  --card-radius: calc(var(--card-width) * 18 / 344);
+  width: var(--card-width);
+  height: var(--card-height);
+  border-radius: var(--card-radius);
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.2);
+  overflow: hidden;
+  position: relative;
+  pointer-events: none;
+  font-size: calc(var(--card-width) * 14 / 344);
+}
+
+.frontHeader {
+  height: calc(var(--card-height) * 115 / 208);
+  width: 100%;
+  background: #f1f5f9;
+  overflow: hidden;
+}
+
+.headerImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.avatarRing {
+  position: absolute;
+  top: calc(var(--card-height) * 75 / 208);
+  left: calc(var(--card-width) * 16 / 344);
+  width: calc(var(--card-width) * 64 / 344);
+  height: calc(var(--card-width) * 64 / 344);
+  border-radius: 50%;
+  border: calc(var(--card-width) * 4 / 344) solid #ffffff;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 14px 22px rgba(15, 23, 42, 0.22);
+}
+
+.profileImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.frontBody {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--card-height) * 10 / 208);
+  padding: calc(var(--card-height) * 28 / 208) calc(var(--card-width) * 16 / 344)
+    calc(var(--card-height) * 12 / 208);
+}
+
+.nameRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4em;
+}
+
+.name {
+  font-weight: 700;
+  line-height: 1.2;
+  color: #0f172a;
+}
+
+.emoji {
+  line-height: 1;
+}
+
+.username {
+  font-size: 0.9em;
+  color: #64748b;
+  line-height: 1.2;
+}
+
+.bio {
+  font-size: 0.86em;
+  line-height: 1.35;
+  color: #1f2937;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.websiteRow {
+  display: flex;
+  align-items: center;
+  gap: 0.45em;
+  font-size: 0.86em;
+  color: #2563eb;
+  margin-top: -0.2em;
+}
+
+.websiteIcon {
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+  color: inherit;
+  fill: currentColor;
+}
+
+.websiteText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: calc(var(--card-width) - calc(var(--card-width) * 32 / 344));
+}
+
+.backCard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--card-width) * 32 / 344);
+}
+
+.qrRow {
+  width: 100%;
+  display: flex;
+  gap: calc(var(--card-width) * 28 / 344);
+  align-items: stretch;
+  justify-content: center;
+}
+
+.qrBlock {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: calc(var(--card-height) * 8 / 208);
+}
+
+.qrImage,
+.qrPlaceholder {
+  width: calc(var(--card-width) * 82 / 344);
+  height: calc(var(--card-width) * 82 / 344);
+}
+
+.qrImage {
+  object-fit: contain;
+  border-radius: calc(var(--card-width) * 12 / 344);
+  background: #ffffff;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.12);
+}
+
+.qrPlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: calc(var(--card-width) * 12 / 344);
+  background: rgba(241, 245, 249, 0.9);
+  border: 1px dashed rgba(148, 163, 184, 0.65);
+  color: #94a3b8;
+  font-size: 0.72em;
+}
+
+.qrLabel {
+  font-size: 0.8em;
+  color: #64748b;
+  margin: 0;
+}
+
+.qrValue {
+  font-size: 0.8em;
+  color: #0f172a;
+  margin: 0;
+  word-break: break-word;
+}
+
+@media (max-width: 480px) {
+  .previewStack {
+    gap: 1rem;
+  }
+
+  .card {
+    --card-width: calc(100vw - 32px);
+  }
+}

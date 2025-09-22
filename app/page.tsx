@@ -1,11 +1,5 @@
-import styles from './page.module.css';
-import { CardShowcase } from './components/card/CardShowcase';
-import { cardSpec } from './data/cardSpec';
+import { redirect } from 'next/navigation';
 
 export default function Page() {
-  return (
-    <main className={styles.main}>
-      <CardShowcase spec={cardSpec} />
-    </main>
-  );
+  redirect('/kira-your-card');
 }

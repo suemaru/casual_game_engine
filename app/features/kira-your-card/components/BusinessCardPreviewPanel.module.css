@@ -1,0 +1,65 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 24px;
+  padding: 20px;
+  min-height: 0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #e2e8f0;
+}
+
+.toggleGroup {
+  display: flex;
+  gap: 8px;
+}
+
+.toggleButton {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(100, 116, 139, 0.22);
+  color: #e2e8f0;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.toggleButtonActive {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(147, 51, 234, 0.9));
+  color: white;
+  border-color: transparent;
+}
+
+.canvasFrame {
+  position: relative;
+  width: 100%;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.45);
+  border-radius: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.canvasFrame canvas {
+  width: 100%;
+  height: auto;
+  max-width: 420px;
+  border-radius: 18px;
+  box-shadow: 0 18px 42px rgba(8, 15, 37, 0.45);
+}
+
+.placeholder {
+  color: #94a3b8;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}

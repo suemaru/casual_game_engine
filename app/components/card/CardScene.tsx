@@ -49,9 +49,9 @@ export function CardScene({
   const holoParallax = useRef(new Vector2());
 
   const textures = useTexture({
-    main: spec.assets.main,
-    background: spec.assets.background,
-    subject: spec.assets.subject ?? spec.assets.main,
+    front: spec.textures.front,
+    back: spec.textures.back,
+    hologram: spec.textures.hologram ?? spec.textures.front,
     frame: '/assets/card/frame.png',
   });
 
@@ -62,7 +62,7 @@ export function CardScene({
     });
   }, [isMobile, textures]);
 
-  const subjectTexture = spec.assets.subject ? textures.subject : undefined;
+  const hasHologramOverlay = Boolean(spec.textures.hologram);
 
   const frontMaterial = useMemo(() => {
     const material = new HologramMaterialImpl();
@@ -85,9 +85,9 @@ export function CardScene({
   }, []);
 
   useEffect(() => {
-    frontMaterial.uniforms.uTexture.value = subjectTexture ?? textures.main;
-    backMaterial.uniforms.uTexture.value = textures.background;
-  }, [frontMaterial, backMaterial, subjectTexture, textures.background, textures.main]);
+    frontMaterial.uniforms.uTexture.value = textures.hologram;
+    backMaterial.uniforms.uTexture.value = textures.back;
+  }, [frontMaterial, backMaterial, textures.hologram, textures.back]);
 
   useEffect(() => () => frontMaterial.dispose(), [frontMaterial]);
   useEffect(() => () => backMaterial.dispose(), [backMaterial]);
@@ -168,13 +168,13 @@ export function CardScene({
       </mesh>
 
       <mesh position={[0, 0, 0]} geometry={baseGeometry}>
-        <meshStandardMaterial map={textures.main} roughness={0.45} metalness={0.15} />
+        <meshStandardMaterial map={textures.front} roughness={0.45} metalness={0.15} />
       </mesh>
 
-      {subjectTexture && (
+      {hasHologramOverlay && (
         <mesh position={[0, 0, IMAGE_DEPTH]} geometry={baseGeometry}>
           <meshStandardMaterial
-            map={subjectTexture}
+            map={textures.hologram}
             transparent
             roughness={0.3}
             metalness={0.1}

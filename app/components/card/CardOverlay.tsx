@@ -1,59 +1,171 @@
 'use client';
 
-import clsx from 'clsx';
+import Image from 'next/image';
 import { forwardRef, useEffect, useState } from 'react';
-import { CardSpec } from '../../data/cardSpec';
-import styles from './CardShowcase.module.css';
+import QRCode from 'qrcode';
+import type { CardSpec } from '../../data/cardSpec';
+import layoutStyles from './CardShowcase.module.css';
+import styles from './CardOverlay.module.css';
 
 export type CardOverlayProps = {
   spec: CardSpec;
-  burstSignal: number;
-  kickSignal: number;
 };
 
-export const CardOverlay = forwardRef<HTMLDivElement, CardOverlayProps>(
-  ({ spec, burstSignal, kickSignal }, ref) => {
-    const [burstActive, setBurstActive] = useState(false);
-    const [kickActive, setKickActive] = useState(false);
+const normalizeWebsite = (value?: string) => {
+  if (!value) return undefined;
+  return value.startsWith('http://') || value.startsWith('https://') ? value : `https://${value}`;
+};
 
-    useEffect(() => {
-      if (!burstSignal) return;
-      setBurstActive(true);
-      const timer = setTimeout(() => setBurstActive(false), 260);
-      return () => clearTimeout(timer);
-    }, [burstSignal]);
+export const CardOverlay = forwardRef<HTMLDivElement, CardOverlayProps>(({ spec }, ref) => {
+  const { front, back } = spec;
+  const [xProfileQr, setXProfileQr] = useState<string | null>(null);
+  const [websiteQr, setWebsiteQr] = useState<string | null>(null);
 
-    useEffect(() => {
-      if (!kickSignal) return;
-      setKickActive(true);
-      const timer = setTimeout(() => setKickActive(false), 300);
-      return () => clearTimeout(timer);
-    }, [kickSignal]);
+  useEffect(() => {
+    let cancelled = false;
 
-    return (
-      <div ref={ref} className={styles.overlay}>
-        {/* タイトルブロック：文字サイズや影は styles.title で調整 */}
-        <h1 className={clsx(styles.title, burstActive && styles.burstPulse)}>{spec.title}</h1>
+    setXProfileQr(null);
+    setWebsiteQr(null);
 
-        {/* detailSection 内でステータス／フレーバー／シリアルの余白と並びを制御 */}
-        <div className={clsx(styles.detailSection, kickActive && styles.haneFlash)}>
-          {/* statsRow をいじるとフォントや列数を変更できる */}
-          <div className={styles.statsRow}>
-            {spec.parameters.map((param) => (
-              <div key={param.label} className={styles.stat}>
-                <span>{param.label}</span>
-                <span>{param.value}</span>
-              </div>
-            ))}
+    const generateQrCodes = async () => {
+      const xUrl = `https://x.com/${front.username}`;
+      try {
+        const dataUrl = await QRCode.toDataURL(xUrl, { width: 160, margin: 1 });
+        if (!cancelled) {
+          setXProfileQr(dataUrl);
+        }
+      } catch (error) {
+        console.error('Failed to generate X profile QR code', error);
+        if (!cancelled) {
+          setXProfileQr(null);
+        }
+      }
+
+      const websiteUrl = normalizeWebsite(back.website ?? front.website);
+      if (!websiteUrl) {
+        if (!cancelled) {
+          setWebsiteQr(null);
+        }
+        return;
+      }
+
+      try {
+        const dataUrl = await QRCode.toDataURL(websiteUrl, { width: 160, margin: 1 });
+        if (!cancelled) {
+          setWebsiteQr(dataUrl);
+        }
+      } catch (error) {
+        console.error('Failed to generate website QR code', error);
+        if (!cancelled) {
+          setWebsiteQr(null);
+        }
+      }
+    };
+
+    generateQrCodes();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [front.username, front.website, back.website]);
+
+  return (
+    <div ref={ref} className={layoutStyles.overlay}>
+      <div className={styles.previewStack}>
+        <article className={`${styles.card}`} aria-label="名刺の表面プレビュー">
+          <div className={styles.frontHeader}>
+            <Image
+              src={front.headerImage}
+              alt="プロフィールのヘッダー画像"
+              className={styles.headerImage}
+              width={1200}
+              height={450}
+              unoptimized
+            />
           </div>
-          {/* story は背景付きのフレーバー枠。影やぼかしは CSS 側で管理 */}
-          <p className={styles.story}>{spec.story}</p>
-          {/* serial の位置や字間も CSS 側の styles.serial をいじれば調整可能 */}
-          <p className={styles.serial}>{spec.serial}</p>
-        </div>
+          <div className={styles.avatarRing}>
+            <Image
+              src={front.profileImage}
+              alt={`${front.name}のプロフィール画像`}
+              className={styles.profileImage}
+              width={512}
+              height={512}
+              unoptimized
+            />
+          </div>
+          <div className={styles.frontBody}>
+            <div className={styles.nameRow}>
+              <span className={styles.name}>{front.name}</span>
+              {front.emoji ? <span className={styles.emoji}>{front.emoji}</span> : null}
+              <span className={styles.username}>@{front.username}</span>
+            </div>
+            <p className={styles.bio}>{front.bio}</p>
+            {front.website ? (
+              <div className={styles.websiteRow}>
+                <svg viewBox="0 0 24 24" aria-hidden="true" className={styles.websiteIcon}>
+                  <path
+                    d="M10.59 13.41a1 1 0 0 1 0-1.41l2.83-2.83a1 1 0 0 1 1.41 1.41l-2.83 2.83a1 1 0 0 1-1.41 0Z"
+                  />
+                  <path
+                    d="M12.71 5.29a1 1 0 0 1 1.41 0l2.59 2.59a1 1 0 0 1 0 1.41l-.88.88a1 1 0 1 1-1.41-1.41l.18-.18-1.18-1.18-1.18 1.18a1 1 0 0 1-1.41-1.41l2-2Z"
+                  />
+                  <path
+                    d="M8.71 9.29a1 1 0 0 1 1.41 0l1.59 1.59-1.41 1.41-1.59-1.59a1 1 0 0 1 0-1.41Z"
+                  />
+                  <path
+                    d="M7.29 12.71a1 1 0 0 1 0-1.41l.88-.88a1 1 0 0 1 1.41 1.41l-.18.18 1.18 1.18 1.18-1.18a1 1 0 0 1 1.41 1.41l-2 2a1 1 0 0 1-1.41 0l-2.59-2.59Z"
+                  />
+                  <path d="M8 5a3 3 0 0 1 3-3h7a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3" fill="none" stroke="currentColor" strokeWidth="2" />
+                  <path d="M16 19a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-7a3 3 0 0 1 3-3" fill="none" stroke="currentColor" strokeWidth="2" />
+                </svg>
+                <span className={styles.websiteText}>{front.website}</span>
+              </div>
+            ) : null}
+          </div>
+        </article>
+
+        <article className={`${styles.card} ${styles.backCard}`} aria-label="名刺の裏面プレビュー">
+          <div className={styles.qrRow}>
+            <div className={styles.qrBlock}>
+              {xProfileQr ? (
+                <Image
+                  src={xProfileQr}
+                  alt={`@${front.username} のXプロフィールへのQRコード`}
+                  className={styles.qrImage}
+                  width={160}
+                  height={160}
+                  unoptimized
+                />
+              ) : (
+                <div className={styles.qrPlaceholder}>QR生成中…</div>
+              )}
+              <p className={styles.qrLabel}>X Profile</p>
+              <p className={styles.qrValue}>@{front.username}</p>
+            </div>
+
+            {(back.website ?? front.website) ? (
+              <div className={styles.qrBlock}>
+                {websiteQr ? (
+                  <Image
+                    src={websiteQr}
+                    alt={`ウェブサイト${back.website ?? front.website}へのQRコード`}
+                    className={styles.qrImage}
+                    width={160}
+                    height={160}
+                    unoptimized
+                  />
+                ) : (
+                  <div className={styles.qrPlaceholder}>QR生成中…</div>
+                )}
+                <p className={styles.qrLabel}>Website</p>
+                <p className={styles.qrValue}>{back.website ?? front.website}</p>
+              </div>
+            ) : null}
+          </div>
+        </article>
       </div>
-    );
-  },
-);
+    </div>
+  );
+});
 
 CardOverlay.displayName = 'CardOverlay';

@@ -85,114 +85,15 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: min(540px, 75%);
   transform-style: preserve-3d;
   transform: translate(-50%, -50%) var(--overlay-tilt, rotateX(0deg) rotateY(0deg))
     translateZ(calc(var(--overlay-z, 0px) * 1px));
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: clamp(1.2rem, 2vw, 1.8rem);
-  padding: 0;
+  align-items: center;
+  gap: clamp(1.4rem, 2vw, 1.8rem);
   font-family: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif;
   z-index: 2;
-}
-
-/* detailSection：ステータス〜フレーバーのまとまり。gapやpaddingで上下配置を調整 */
-.detailSection {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 0 2.4rem;
-}
-
-/* タイトル行：フォントサイズや影、横幅の制限などはここで制御 */
-.title {
-  font-family: 'Noto Serif JP', serif;
-  font-weight: 700;
-  font-size: clamp(1.25rem, 1vw, 1.6rem);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #f9f9fc;
-  text-shadow: 0 4px 14px rgba(12, 18, 30, 0.65), 0 0 18px rgba(104, 165, 255, 0.28);
-  margin: 0 1.8rem;
-  margin-top: 1.3rem;
-  margin-bottom: 22.8rem;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* ステータス表：列数・フォントサイズ・字間はここで変更 */
-.statsRow {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.6rem 1.1rem;
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
-  text-shadow: 0 6px 16px rgba(10, 18, 32, 0.7), 0 0 10px rgba(80, 140, 220, 0.35);
-}
-
-.stat {
-  display: flex;
-  justify-content: space-between;
-  color: rgba(230, 235, 255, 0.9);
-  letter-spacing: 0.08em;
-}
-
-.serial {
-  align-self: flex-end;
-  font-size: 0.74rem;
-  letter-spacing: 0.22em;
-  color: rgba(210, 215, 230, 0.8);
-  text-shadow: 0 6px 16px rgba(8, 12, 22, 0.75), 0 0 8px rgba(84, 140, 220, 0.3);
-}
-
-/* フレーバー枠：背景のぼかし感や角丸をここで調整 */
-.story {
-  font-size: 0.78rem;
-  line-height: 1.65;
-  color: rgba(238, 242, 255, 0.88);
-  background: linear-gradient(90deg, rgba(18, 24, 42, 0.65), rgba(8, 10, 18, 0.1));
-  padding: 0.65rem 0.75rem;
-  border-radius: 0.9rem;
-  box-shadow: inset 0 0 0 1px rgba(105, 170, 235, 0.25);
-}
-
-.burstPulse {
-  animation: burstPulse 280ms ease-out;
-}
-
-.haneFlash {
-  animation: haneFlash 280ms ease-out;
-}
-
-@keyframes burstPulse {
-  0% {
-    box-shadow: 0 0 0px rgba(120, 210, 255, 0.0);
-    transform: scale(1);
-  }
-  40% {
-    box-shadow: 0 0 22px rgba(120, 210, 255, 0.45);
-    transform: scale(1.02);
-  }
-  100% {
-    box-shadow: 0 0 0px rgba(120, 210, 255, 0.0);
-    transform: scale(1);
-  }
-}
-
-@keyframes haneFlash {
-  0% {
-    filter: brightness(1);
-  }
-  45% {
-    filter: brightness(1.15) saturate(1.05);
-  }
-  100% {
-    filter: brightness(1);
-  }
 }
 
 @media (max-width: 640px) {
@@ -210,22 +111,13 @@
   }
 
   .overlay {
-    width: 85%;
-    padding: 1.25rem 1.1rem 1.4rem;
-  }
-
-  .title {
-    font-size: clamp(1.35rem, 2.8vw, 1.8rem);
+    gap: 1.4rem;
   }
 }
 
 @media (min-width: 768px) {
   .cardContainer {
     width: min(calc(80vw * 0.62), calc(80vh * 0.82), 74vw);
-  }
-
-  .overlay {
-    width: min(560px, 66%);
   }
 }
 

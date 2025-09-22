@@ -2,33 +2,37 @@
 
 import { KeyboardEvent, PointerEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { MathUtils } from 'three';
-import { CardSpec } from '../../data/cardSpec';
-import { useReducedMotion } from '../hooks/useReducedMotion';
-import { useIsMobile } from '../hooks/useIsMobile';
-import { CardController } from './CardController';
-import styles from './CardShowcase.module.css';
-import { CardCanvas } from './CardCanvas';
-import { CardOverlay } from './CardOverlay';
-import { SceneBackground } from './SceneBackground';
+import { CardController } from '../../../components/card/CardController';
+import { useReducedMotion } from '../../../components/hooks/useReducedMotion';
+import { useIsMobile } from '../../../components/hooks/useIsMobile';
+import { BusinessCardSpec } from '../data/businessCardSpec';
+import { BusinessCardRenderResult } from '../hooks/useBusinessCardRender';
+import { BusinessCardBackground } from './BusinessCardBackground';
+import { BusinessCardCanvas } from './BusinessCardCanvas';
+import styles from './BusinessCardStage.module.css';
 
-export type CardShowcaseProps = {
-  spec: CardSpec;
+type BusinessCardStageProps = {
+  spec: BusinessCardSpec;
+  renderResult: BusinessCardRenderResult | null;
+  isRendering: boolean;
 };
 
-export function CardShowcase({ spec }: CardShowcaseProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+export function BusinessCardStage({ spec, renderResult, isRendering }: BusinessCardStageProps) {
+  const reduced = useReducedMotion();
+  const isMobile = useIsMobile();
+
   const controllerRef = useRef<CardController | null>(null);
   if (!controllerRef.current) {
     controllerRef.current = new CardController();
   }
-  const controller = controllerRef.current!;
+  const controller = controllerRef.current;
 
-  const overlayRef = useRef<HTMLDivElement>(null);
-
-  const reduced = useReducedMotion();
-  const isMobile = useIsMobile();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [burstSignal, setBurstSignal] = useState(0);
+  const [kickSignal, setKickSignal] = useState(0);
 
   const pressedKeysRef = useRef<Set<string>>(new Set());
+  const overlayRef = useRef<HTMLDivElement>(null);
 
   const updateKeyboardTilt = useCallback(() => {
     const keys = pressedKeysRef.current;
@@ -55,8 +59,10 @@ export function CardShowcase({ spec }: CardShowcaseProps) {
   }, [controller, reduced, isMobile, updateKeyboardTilt]);
 
   useEffect(() => {
-    controller.setKeyboardTilt(0, 0);
-  }, [controller]);
+    controller.onBurst = () => setBurstSignal((prev) => prev + 1);
+    controller.onKick = () => setKickSignal((prev) => prev + 1);
+    controller.resetIntro();
+  }, [controller, spec]);
 
   useEffect(() => {
     let raf = 0;
@@ -65,27 +71,12 @@ export function CardShowcase({ spec }: CardShowcaseProps) {
       if (overlay) {
         const rotateX = MathUtils.radToDeg(controller.rotation.x);
         const rotateY = MathUtils.radToDeg(controller.rotation.y);
-        overlay.style.setProperty(
-          '--overlay-tilt',
-          `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
-        );
-        // depth を変えるとUIカードの浮き具合を調整できる
-        const depth = 0;
-        overlay.style.setProperty('--overlay-z', `${depth}`);
+        overlay.style.setProperty('--overlay-tilt', `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`);
       }
       raf = requestAnimationFrame(update);
     };
     update();
     return () => cancelAnimationFrame(raf);
-  }, [controller]);
-
-  const [burstSignal, setBurstSignal] = useState(0);
-  const [kickSignal, setKickSignal] = useState(0);
-
-  useEffect(() => {
-    controller.onBurst = () => setBurstSignal((prev) => prev + 1);
-    controller.onKick = () => setKickSignal((prev) => prev + 1);
-    controller.resetIntro();
   }, [controller]);
 
   const getRect = () => containerRef.current?.getBoundingClientRect();
@@ -96,7 +87,7 @@ export function CardShowcase({ spec }: CardShowcaseProps) {
     try {
       event.currentTarget.setPointerCapture(event.pointerId);
     } catch {
-      // Some mobile browsers lack pointer capture; ignore safely.
+      // ignore if unsupported
     }
     controller.handlePointerDown(event.clientX, event.clientY, rect, event.timeStamp);
   };
@@ -154,36 +145,45 @@ export function CardShowcase({ spec }: CardShowcaseProps) {
   };
 
   return (
-    <section className={styles.wrapper}>
-      <div className={styles.backgroundCanvas}>
-        <SceneBackground reducedMotion={reduced} isMobile={isMobile} />
+    <div className={styles.stage}>
+      <div className={styles.background}>
+        <BusinessCardBackground environment={spec.environment} reducedMotion={reduced} isMobile={isMobile} />
       </div>
-      <div
-        ref={containerRef}
-        className={styles.cardContainer}
-        tabIndex={0}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerLeave}
-        onPointerLeave={onPointerLeave}
-        onPointerEnter={onPointerEnter}
-        onKeyDown={onKeyDown}
-        onKeyUp={onKeyUp}
-        onBlur={onBlur}
-      >
-        <div className={styles.canvasWrapper}>
-          <CardCanvas
-            spec={spec}
-            controller={controller}
-            burstSignal={burstSignal}
-            kickSignal={kickSignal}
-            reducedMotion={reduced}
-            isMobile={isMobile}
-          />
+      <div className={styles.content}>
+        <div className={styles.canvasWrap}>
+          <div
+            ref={containerRef}
+            className={styles.canvasInner}
+            tabIndex={0}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onPointerCancel={onPointerLeave}
+            onPointerLeave={onPointerLeave}
+            onPointerEnter={onPointerEnter}
+            onKeyDown={onKeyDown}
+            onKeyUp={onKeyUp}
+            onBlur={onBlur}
+            role="presentation"
+          >
+            {renderResult ? (
+              <BusinessCardCanvas
+                controller={controller}
+                textures={{
+                  frontTexture: renderResult.frontTexture,
+                  backTexture: renderResult.backTexture,
+                }}
+                burstSignal={burstSignal}
+                kickSignal={kickSignal}
+                reducedMotion={reduced}
+                isMobile={isMobile}
+              />
+            ) : null}
+            {isRendering && <div className={styles.loadingOverlay}>Rendering card…</div>}
+            <div ref={overlayRef} style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} />
+          </div>
         </div>
-        <CardOverlay ref={overlayRef} spec={spec} />
       </div>
-    </section>
+    </div>
   );
 }
